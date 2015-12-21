@@ -1,9 +1,10 @@
-import os
+import json
 import sys
 
-from sqlalchemy import create_engine
 from sqlalchemy import Column, Float, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
+
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
@@ -29,24 +30,39 @@ class Type(Base):
 
         return query.all()
 
-if not os.environ.get('DB_USER', None):
-    sys.stderr.write('DB_USER not set in environment')
-    os.exit(1)
-if not os.environ.get('DB_PASS', None):
-    sys.stderr.write('DB_PASS not set in environment')
-    os.exit(1)
-if not os.environ.get('DB_HOST', None):
-    sys.stderr.write('DB_HOST not set in environment')
-    os.exit(1)
-if not os.environ.get('DB_NAME', None):
-    sys.stderr.write('DB_NAME not set in environment')
-    os.exit(1)
+    @staticmethod
+    def get(session, by_id):
+        return session.query(Type).filter_by(id=by_id).first()
 
-db_user = os.environ['DB_USER']
-db_pass = os.environ['DB_PASS']
-db_host = os.environ['DB_HOST']
-db_name = os.environ['DB_NAME']
+    def as_dict(self):
+        return {'id': self.id, 'name': self.name.decode('utf-8', 'replace'),
+                'volume': self.volume, 'capacity': self.capacity,
+                'portion_size': self.portion_size}
 
-connect_str = 'mysql://%s:%s@%s/%s' % (db_user, db_pass, db_host, db_name)
-engine = create_engine(connect_str, echo=True)
-Sessions = sessionmaker(bind=engine)
+    def is_clean(self):
+        try:
+            json.dumps({'name': self.name})
+        except UnicodeDecodeError:
+            sys.stderr.write('UnicodeDecodeError decoding id=%s name=%s\n'
+                             % (self.id, self.name))
+            return False
+        else:
+            return True
+
+
+class DBSessionFactory(object):
+    def __init__(self, sessions):
+        self.sessions = sessions
+
+    def process_request(self, req, resp):
+        req.context['session'] = self.sessions()
+
+    def process_response(self, req, resp, resource):
+        req.context['session'].close()
+
+
+def prepare_storage(connect_str):
+    engine = create_engine(connect_str, echo=True)
+    return sessionmaker(bind=engine)
+
+
