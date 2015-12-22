@@ -1,0 +1,11 @@
+# base.docker
+FROM ubuntu:trusty
+
+RUN apt-get update
+
+RUN apt-get install -qyy \
+    -o APT::Install-Recommends=false -o APT::Install-Suggests=false \
+    python-virtualenv python-mysqldb
+
+RUN virtualenv /appenv
+RUN . /appenv/bin/activate; pip install --upgrade pip==7.1.2

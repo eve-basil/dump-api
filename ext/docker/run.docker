@@ -1,0 +1,12 @@
+# run.docker
+FROM dump-api-base
+
+ADD wheelhouse /wheelhouse
+
+RUN . /appenv/bin/activate; \
+    pip install --no-index -f wheelhouse basil-dump-api
+
+EXPOSE 8081
+
+ENTRYPOINT . /appenv/bin/activate; \
+    gunicorn -b 0.0.0.0:8081 -w 2 -k gevent basil-dump-api.server:application

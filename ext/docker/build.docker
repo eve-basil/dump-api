@@ -1,0 +1,20 @@
+# build.docker
+FROM dump-api-base
+
+RUN apt-get install -qy python-dev git libmysqlclient-dev
+
+RUN . /appenv/bin/activate; \
+    pip install wheel
+
+RUN mkdir /wheelhouse
+
+ENV WHEELHOUSE=/wheelhouse
+ENV PIP_WHEEL_DIR=/wheelhouse
+ENV PIP_FIND_LINKS=/wheelhouse
+
+RUN cd /; git clone https://github.com/eve-basil/dump-api.git application
+
+ENTRYPOINT . /appenv/bin/activate; cd /application; \
+    pip wheel cython; \
+    pip wheel falcon; \
+    pip wheel .;
