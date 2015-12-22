@@ -10,6 +10,7 @@ setup(
                       "falcon==0.3.0",
                       "gevent==1.0.2",
                       "gunicorn==19.4.1",
-                      "SQLAlchemy==1.0.10"],
+                      "SQLAlchemy==1.0.10",
+                      "mysql-python==1.2.5"],
 )
 
