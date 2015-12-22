@@ -1,9 +1,9 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name="basil-dump-api",
     version="0.1.0.dev",
-    packages=find_packages(),
+    py_modules=['storage', 'api', 'server'],
 
     description="API serving content from Eve Online data dump.",
     install_requires=["Cython==0.23.4",
@@ -12,6 +12,4 @@ setup(
                       "gunicorn==19.4.1",
                       "SQLAlchemy==1.0.10"],
 )
-# entry_points     = {'console_scripts':
-#                        ['run-the-app = deployme:main']}
 

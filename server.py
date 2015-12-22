@@ -41,4 +41,4 @@ def initialize_app():
     sessionManager = storage.DBSessionFactory(db)
     return api.create_api([sessionManager])
 
-app = initialize_app()
+application = initialize_app()
