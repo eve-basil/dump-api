@@ -1,9 +1,9 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name="basil-dump-api",
     version="0.1.0.dev",
-    py_modules=['storage', 'api', 'server'],
+    packages=find_packages(),
 
     description="API serving content from Eve Online data dump.",
     install_requires=["Cython==0.23.4",
