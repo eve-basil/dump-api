@@ -55,4 +55,5 @@ docs/_build/
 target/
 
 # dev environments
+Vagrantfile
 .vagrant/

@@ -1,0 +1,18 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.hostname = "dumpapi.basil.devbox"
+  #config.vm.network "private_network", ip: "192.168.77.11"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "dump-api.basil.devbox"
+  end
+
+  config.vm.provision "shell", path: "ext/bootstrap.sh", name: "Setting up run and dev env."
+  config.vm.provision "shell", inline: "pip install -r /vagrant/requirements.txt", name: "Installing requirements."
+
+end
