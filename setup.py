@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="basil-dump-api",
+    name="basildumpapi",
     version="0.1.0.dev",
     packages=find_packages(),
 

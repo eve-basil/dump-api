@@ -1,8 +1,10 @@
+import logging
 import os
-import sys
 
 import api
 import storage
+
+logging = logging.getLogger(__name__)
 
 
 def database_connector():
@@ -17,22 +19,22 @@ def ensure_data(session):
     first = session.query(storage.Type).first()
     session.close()
     if not first:
-        sys.stderr.write('DB_NAME not set in environment')
+        logging.critical('Could not connect to SDK dump DB')
         os.exit(1)
 
 
 def initialize_app():
     if not os.environ.get('DB_USER', None):
-        sys.stderr.write('DB_USER not set in environment')
+        logging.critical('DB_USER not set in environment')
         os.exit(1)
     if not os.environ.get('DB_PASS', None):
-        sys.stderr.write('DB_PASS not set in environment')
+        logging.critical('DB_PASS not set in environment')
         os.exit(1)
     if not os.environ.get('DB_HOST', None):
-        sys.stderr.write('DB_HOST not set in environment')
+        logging.critical('DB_HOST not set in environment')
         os.exit(1)
     if not os.environ.get('DB_NAME', None):
-        sys.stderr.write('DB_NAME not set in environment')
+        logging.critical('DB_NAME not set in environment')
         os.exit(1)
 
     db = storage.prepare_storage(database_connector())

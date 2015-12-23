@@ -9,4 +9,4 @@ RUN . /appenv/bin/activate; \
 EXPOSE 8081
 
 ENTRYPOINT . /appenv/bin/activate; \
-    gunicorn -b 0.0.0.0:8081 -w 2 -k gevent basil-dump-api.server:application
+    gunicorn --access-logfile - --error-logfile - -b 0.0.0.0:8081 -w 2 -k gevent basil.dumpapi.server

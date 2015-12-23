@@ -1,5 +1,5 @@
 import json
-import sys
+import logging
 
 from sqlalchemy import Column, Float, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
@@ -7,6 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+logging = logging.getLogger(__name__)
 Base = declarative_base()
 
 
@@ -43,8 +44,8 @@ class Type(Base):
         try:
             json.dumps({'name': self.name})
         except UnicodeDecodeError:
-            sys.stderr.write('UnicodeDecodeError decoding id=%s name=%s\n'
-                             % (self.id, self.name))
+            logging.warning('UnicodeDecodeError decoding:: id=%s name=%s\n'
+                            % (self.id, self.name))
             return False
         else:
             return True
@@ -62,7 +63,7 @@ class DBSessionFactory(object):
 
 
 def prepare_storage(connect_str):
-    engine = create_engine(connect_str, echo=True)
+    engine = create_engine(connect_str)
     return sessionmaker(bind=engine)
 
 

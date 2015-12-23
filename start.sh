@@ -11,5 +11,5 @@
 # export WEB_PORT=8080
 # export WEB_HOST=0.0.0.0
 
-gunicorn -b ${WEB_HOST}:${WEB_PORT} -w ${WEB_WORKERS} -k gevent \
-    basil-dump-api.server:application
+gunicorn --access-logfile - --error-logfile - -b ${WEB_HOST}:${WEB_PORT} \
+    -w ${WEB_WORKERS} -k gevent basil.dumpapi.server
