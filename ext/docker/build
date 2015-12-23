@@ -1,5 +1,5 @@
 # build.docker
-FROM dump-api-base
+FROM apibase
 
 RUN apt-get install -qy python-dev git libmysqlclient-dev
 

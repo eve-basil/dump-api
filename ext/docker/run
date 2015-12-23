@@ -1,5 +1,5 @@
 # run.docker
-FROM dump-api-base
+FROM apibase
 
 ADD wheelhouse /wheelhouse
 

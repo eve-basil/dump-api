@@ -1,0 +1,16 @@
+# debug.docker
+FROM apibase
+
+RUN apt-get install -qy python-dev libmysqlclient-dev vim tmux
+RUN mkdir /application
+ADD basil /application/basil
+ADD requirements.txt /application/requirements.txt
+ADD start.sh /application
+RUN . /appenv/bin/activate; pip install -r /application/requirements.txt
+
+EXPOSE 8081
+
+ENTRYPOINT tmux new
+
+# TODO(stevelle) make the virtualenv activate automatically on all shells,
+#   and try to get the server to start up correctly in the tmux session
