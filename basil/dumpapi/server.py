@@ -6,6 +6,15 @@ import storage
 
 logging = logging.getLogger(__name__)
 
+_REQUIRED_OPTS = ['DB_USER', 'DB_PASS', 'DB_HOST', 'DB_NAME']
+
+
+def verify_parameters():
+    missing = [n for n in _REQUIRED_OPTS if not os.environ.get(n, None)]
+    if len(missing) > 0:
+        logging.critical('Missing options in environment: %s' % missing)
+        exit(1)
+
 
 def database_connector():
     db_user = os.environ['DB_USER']
@@ -20,27 +29,16 @@ def ensure_data(session):
     session.close()
     if not first:
         logging.critical('Could not connect to SDK dump DB')
-        os.exit(1)
+        exit(1)
 
 
 def initialize_app():
-    if not os.environ.get('DB_USER', None):
-        logging.critical('DB_USER not set in environment')
-        os.exit(1)
-    if not os.environ.get('DB_PASS', None):
-        logging.critical('DB_PASS not set in environment')
-        os.exit(1)
-    if not os.environ.get('DB_HOST', None):
-        logging.critical('DB_HOST not set in environment')
-        os.exit(1)
-    if not os.environ.get('DB_NAME', None):
-        logging.critical('DB_NAME not set in environment')
-        os.exit(1)
+    verify_parameters()
 
     db = storage.prepare_storage(database_connector())
     ensure_data(db())
 
-    sessionManager = storage.DBSessionFactory(db)
-    return api.create_api([sessionManager])
+    session_manager = storage.DBSessionFactory(db)
+    return api.create_api([session_manager])
 
 application = initialize_app()
