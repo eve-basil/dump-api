@@ -7,6 +7,7 @@
 # export DB_NAME=
 # export DB_USER=
 # export DB_PASS=
+export BLUEPRINTS_FILE=${BLUEPRINTS_FILE:-'data/blueprints.yaml'}
 export WEB_WORKERS=${WEB_WORKERS:-'2'}
 export WEB_PORT=${WEB_PORT:-'8080'}
 export WEB_HOST=${WEB_HOST:-'0.0.0.0'}

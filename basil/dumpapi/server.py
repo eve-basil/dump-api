@@ -2,11 +2,13 @@ import logging
 import os
 
 import api
+import recipes
 import storage
 
 logging = logging.getLogger(__name__)
 
-_REQUIRED_OPTS = ['DB_USER', 'DB_PASS', 'DB_HOST', 'DB_NAME']
+_REQUIRED_OPTS = ['DB_USER', 'DB_PASS', 'DB_HOST', 'DB_NAME',
+                  'BLUEPRINTS_FILE']
 
 
 def verify_parameters():
@@ -34,6 +36,8 @@ def ensure_data(session):
 
 def initialize_app():
     verify_parameters()
+
+    recipes.read_from_file(os.environ['BLUEPRINTS_FILE'])
 
     db = storage.prepare_storage(database_connector())
     ensure_data(db())
