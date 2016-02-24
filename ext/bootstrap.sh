@@ -14,6 +14,7 @@ rm get-pip.py
 pip install --force-reinstall --upgrade cython
 pip install --force-reinstall --upgrade falcon
 pip install --force-reinstall --upgrade pyyaml
+pip install --force-reinstall --upgrade hiredis
 
 if [ -f "requirements.txt" ]
 then

@@ -11,6 +11,8 @@ setup(
                       "gevent==1.0.2",
                       "gunicorn==19.4.1",
                       "SQLAlchemy==1.0.10",
+                      "PyYAML==3.11",
+                      "redis==2.10.5",
                       "mysql-python==1.2.5"],
 )
 

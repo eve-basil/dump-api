@@ -7,8 +7,8 @@ import storage
 
 
 LOG = logger()
-REQUIRED_OPTS = ['DB_USER', 'DB_PASS', 'DB_HOST', 'DB_NAME',
-                 'BLUEPRINTS_FILE']
+REQUIRED_OPTS = ['DB_USER', 'DB_PASS', 'DB_HOST', 'DB_NAME', 'REDIS_HOST',
+                 'REDIS_PASSWORD']
 
 
 def verify_parameters():
@@ -36,10 +36,20 @@ def ensure_data(session):
         exit(1)
 
 
+def ensure_cache(store):
+    pong = store.ping()
+    if not pong:
+        LOG.critical('Could not connect to Blueprint Cache')
+        exit(1)
+
+
 def initialize_app():
     verify_parameters()
 
-    recipes.read_from_file(os.environ['BLUEPRINTS_FILE'])
+    store = recipes.bootstrap_store(os.environ['REDIS_HOST'],
+                                    os.environ['REDIS_PASSWORD'])
+    ensure_cache(store)
+    LOG.info('Cache Connected')
 
     db = storage.prepare_storage(database_connector())
     ensure_data(db())
