@@ -1,7 +1,7 @@
 # debug.docker
 FROM apibase
 
-RUN apt-get install -qy python-dev libmysqlclient-dev vim tmux
+RUN apt-get install -qy python-dev libmysqlclient-dev libyaml-dev  vim tmux
 RUN mkdir /application
 ADD basil /application/basil
 ADD requirements.txt /application/requirements.txt

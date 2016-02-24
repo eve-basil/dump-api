@@ -5,7 +5,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 apt-get update
-apt-get install -y python-dev python-mysqldb tmux vim
+apt-get install -y python-dev python-mysqldb libyaml-dev tmux vim
 
 wget https://bootstrap.pypa.io/get-pip.py
 python get-pip.py
@@ -13,6 +13,7 @@ rm get-pip.py
 
 pip install --force-reinstall --upgrade cython
 pip install --force-reinstall --upgrade falcon
+pip install --force-reinstall --upgrade pyyaml
 
 if [ -f "requirements.txt" ]
 then

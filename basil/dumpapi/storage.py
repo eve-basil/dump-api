@@ -1,5 +1,4 @@
 import json
-import logging
 
 from sqlalchemy import Column, Float, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
@@ -8,7 +7,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.scoping import scoped_session
 
-logging = logging.getLogger(__name__)
+from . import logger
+
+
+LOG = logger()
 Base = declarative_base()
 
 
@@ -45,7 +47,7 @@ class Type(Base):
         try:
             json.dumps({'name': self.name})
         except UnicodeDecodeError:
-            logging.warning('UnicodeDecodeError decoding:: id=%s name=%s\n'
+            LOG.warning('UnicodeDecodeError decoding:: id=%s name=%s\n'
                             % (self.id, self.name))
             return False
         else:
@@ -57,7 +59,7 @@ class DBSessionFactory(object):
         self.sessions = sessions
 
     def process_request(self, req, resp):
-        logging.debug('Setting up session')
+        LOG.debug('Setting up session')
         req.context['session'] = self.sessions()
 
     def process_response(self, req, resp, resource):
@@ -66,16 +68,16 @@ class DBSessionFactory(object):
             resp_status = int(resp.status.split(' ', 1)[0])
             if resp_status in [201, 202, 204]:
                 try:
-                    logging.debug('Committing')
+                    LOG.debug('Committing')
                     req.context['session'].commit()
                 except Exception as ex:
-                    logging.warn(ex.message)
-                    logging.debug('Rolling Back due to sql error')
+                    LOG.warn(ex.message)
+                    LOG.debug('Rolling Back due to sql error')
                     raise ex
             elif resp_status >= 400:
-                logging.debug('Rolling Back: error status [%d]', resp_status)
+                LOG.debug('Rolling Back: error status [%d]', resp_status)
             else:
-                logging.debug('Rolling Back: read-only operation')
+                LOG.debug('Rolling Back: read-only operation')
         finally:
             self.sessions.remove()
 
