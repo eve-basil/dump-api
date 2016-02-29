@@ -2,11 +2,11 @@ import json
 import os
 
 import yaml
+from basil_common import configurables, logger
 
-import basil.dumpapi.recipes as recipes
-from basil.dumpapi import logger
+import recipes as recipes
 
-
+# TODO rewrite this
 LOG = logger()
 
 
@@ -18,7 +18,8 @@ def collect_activities(blueprint):
     if not isinstance(blueprint['activities'], dict):
         raise TypeError(msg='expected activities dict, found [%s]'
                             % type(blueprint['activities']))
-    return [k for k in blueprint['activities'].keys() if k in recipes.ACTIVITY_KEYS]
+    return [k for k in blueprint['activities'].keys()
+            if k in recipes.ACTIVITY_KEYS]
 
 
 def read_from_file(fn):
@@ -66,13 +67,14 @@ def read_from_file(fn):
 
 
 def main():
+    configurables.verify(['REDIS_HOST', 'REDIS_PASSWORD'])
     store = recipes.bootstrap_store(host=os.environ['REDIS_HOST'],
                                     password=os.environ['REDIS_PASSWORD'])
 
     LOG.info('testing redis connection')
     store.info()
 
-    recipes.read_from_file(os.environ['BLUEPRINTS_FILE'])
+    read_from_file(os.environ['BLUEPRINTS_FILE'])
 
     LOG.info('storing: copying')
     for k, v in COPYING.iteritems():

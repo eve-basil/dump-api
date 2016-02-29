@@ -12,7 +12,7 @@ ENV WHEELHOUSE=/wheelhouse
 ENV PIP_WHEEL_DIR=/wheelhouse
 ENV PIP_FIND_LINKS=/wheelhouse
 
-RUN cd /; git clone https://github.com/eve-basil/dump-api.git application
+RUN cd /; git clone https://github.com/eve-basil/refapi.git application
 
 ENTRYPOINT . /appenv/bin/activate; cd /application; \
     pip wheel cython; \

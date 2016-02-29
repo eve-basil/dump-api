@@ -23,4 +23,4 @@ else
     OPTS="${OPTS} --reload --log-level debug"
 fi
 
-gunicorn ${OPTS} basil.dumpapi.server
+gunicorn ${OPTS} basil.refapi.server

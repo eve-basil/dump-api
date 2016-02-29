@@ -1,7 +1,8 @@
-basil.dumpapi
+basil.refapi
 ==============
 
-Hi, I serve some common use cases for consuming the Eve Dump as a RESTful API!
+Hi, I serve some common use cases for consuming the Eve SDK Static Reference 
+data as a RESTful API!
 
 
 Dependencies
@@ -15,6 +16,7 @@ The `requirements/txt` and `production-requirements.txt` files list the
 python packages required to run this web service. Use the first to run
 in dev mode, and use both to produce wheels which should be used to run
 in production when you are satisfied with your testing.
+
 
 Usage
 -----
