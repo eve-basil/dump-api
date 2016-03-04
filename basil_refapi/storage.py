@@ -34,10 +34,13 @@ class Type(Base):
     def get(session, by_id):
         return session.query(Type).filter_by(id=by_id).first()
 
-    def as_dict(self):
+    def dict(self):
         return {'id': self.id, 'name': self.name.decode('utf-8', 'replace'),
                 'volume': self.volume, 'capacity': self.capacity,
                 'portion_size': self.portion_size}
+
+    def json(self):
+        return json.dumps(self.dict())
 
     def is_clean(self):
         try:

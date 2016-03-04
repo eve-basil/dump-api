@@ -40,7 +40,8 @@ def initialize_app():
     injector = falcon_support.InjectorMiddleware(
         {'recipes': rec.Recipes(recipe_store)})
     session_manager = db.SessionManager(db_store)
-    app = api.create_api([session_manager, injector])
+    middleware = [session_manager, injector]
+    app = api.create_api(middleware)
 
     # Add a different root error handler based on: are we in production or not
     error_handler = configurables.root_error_handler()

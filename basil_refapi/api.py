@@ -39,7 +39,7 @@ class TypesResource(object):
         name_starts = req.get_param('name:starts', default=None)
         result = Type.find(req.context['session'], name_starts)
 
-        found = [row.as_dict() for row in result if row.is_clean()]
+        found = [row.dict() for row in result if row.is_clean()]
         respond_with(json.dumps(found), resp)
 
 
@@ -50,7 +50,7 @@ class TypeResource(object):
         if type_id:
             result = Type.get(req.context['session'], type_id)
             if result:
-                respond_with(json.dumps(result.as_dict()), resp)
+                respond_with(result.json(), resp)
             else:
                 raise falcon.HTTPNotFound
         else:
