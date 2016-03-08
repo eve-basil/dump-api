@@ -2,7 +2,6 @@
 basil-common==0.1.0.dev
 falcon==0.3.0
 gunicorn==19.4.1
-mysql-python==1.2.5
 PyYAML==3.11
 SQLAlchemy==1.0.10
 redis==2.10.5

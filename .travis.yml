@@ -1,0 +1,39 @@
+language: python
+
+services:
+  - redis-server
+
+before_install:
+  - sudo apt-get -q update
+  - sudo apt-get install -y python-dev libyaml-dev
+
+install:
+  - 'pip install git+https://github.com/eve-basil/common.git'
+  - 'pip install -r requirements.txt'
+  - 'pip install -r test-requirements.txt'
+
+before_script:
+  - './ext/fetch-data.sh'
+
+script:
+  - 'flake8 basil_refapi'
+  - 'python basil_refapi/migrate.py'
+  - 'py.test tests/unit'
+
+env:
+  - REDIS_HOST=localhost
+  - REDIS_PASSWORD=""
+  - BLUEPRINTS_FILE=data/blueprints.yaml
+
+matrix:
+  include:
+    - python: '2.7'
+    - python: '3.3'
+
+notifications:
+  email: false
+
+git:
+  depth: 3
+
+sudo: false
