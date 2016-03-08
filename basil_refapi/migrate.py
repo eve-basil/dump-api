@@ -67,9 +67,10 @@ def read_from_file(fn):
 
 
 def main():
-    configurables.verify(['REDIS_HOST', 'REDIS_PASSWORD'])
-    store = recipes.bootstrap_store(host=os.environ['REDIS_HOST'],
-                                    password=os.environ['REDIS_PASSWORD'])
+    configurables.verify(['REDIS_HOST', 'BLUEPRINTS_FILE'])
+    host = os.environ['REDIS_HOST']
+    password = os.environ.get('REDIS_PASSWORD', None)
+    store = recipes.bootstrap_store(host=host, password=password)
 
     LOG.info('testing redis connection')
     store.info()

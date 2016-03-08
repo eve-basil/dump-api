@@ -9,4 +9,4 @@ RUN . /appenv/bin/activate; \
 EXPOSE 8081
 
 ENTRYPOINT . /appenv/bin/activate; \
-    gunicorn --access-logfile - --error-logfile - -b 0.0.0.0:8081 -w 2 -k gevent basil.refapi.server
+    gunicorn --access-logfile - --error-logfile - -b 0.0.0.0:8081 -w 2 -k gevent basil_refapi.server

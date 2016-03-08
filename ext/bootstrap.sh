@@ -5,7 +5,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 apt-get update
-apt-get install -y python-dev python-mysqldb libyaml-dev tmux vim
+apt-get install -y python-dev python-mysqldb libyaml-dev libmysqlclient-dev tmux vim bunzip2 git
 
 wget https://bootstrap.pypa.io/get-pip.py
 python get-pip.py
@@ -22,3 +22,8 @@ then
 else
     echo "You need to install the contents of requirements.txt. Could not find the file."
 fi
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+pushd
+  ./fetch-data.sh
+popd

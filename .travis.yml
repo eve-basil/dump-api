@@ -8,10 +8,6 @@ cache:
   - data
   - $HOME/.cache/pip
 
-before_install:
-  - sudo apt-get -q update
-  - sudo apt-get install -y python-dev libyaml-dev
-
 install:
   - 'pip install git+https://github.com/eve-basil/common.git'
   - 'pip install -r requirements.txt'
@@ -23,17 +19,16 @@ before_script:
 script:
   - 'flake8 basil_refapi'
   - 'python basil_refapi/migrate.py'
-  - 'py.test tests/unit'
+  - 'py.test tests'
 
 env:
-  - REDIS_HOST=localhost
-  - REDIS_PASSWORD=""
-  - BLUEPRINTS_FILE=data/blueprints.yaml
+  global:
+    - REDIS_HOST=localhost
+    - BLUEPRINTS_FILE="data/blueprints.yaml"
 
 matrix:
   include:
     - python: '2.7'
-    - python: '3.3'
 
 notifications:
   email: false
