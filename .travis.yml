@@ -3,6 +3,11 @@ language: python
 services:
   - redis-server
 
+cache:
+  directories:
+  - data
+  - $HOME/.cache/pip
+
 before_install:
   - sudo apt-get -q update
   - sudo apt-get install -y python-dev libyaml-dev
