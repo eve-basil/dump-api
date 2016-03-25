@@ -17,7 +17,7 @@ before_script:
   - './ext/fetch-data.sh'
 
 script:
-  - 'flake8 basil_refapi'
+  - 'flake8 --ignore=F403 .'
   - 'python basil_refapi/migrate.py'
   - 'py.test tests'
 
