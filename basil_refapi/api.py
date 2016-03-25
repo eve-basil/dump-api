@@ -16,6 +16,7 @@ LOG = logger()
 
 def create_api(middleware):
     app = falcon.API(middleware=middleware)
+    app.add_route('/health', HealthResource())
     app.add_route('/types', TypesResource())
     app.add_route('/types/{by_id}', TypeResource())
     app.add_route('/recipes/{activity}/{type_id}', ActivityResource())
@@ -31,6 +32,12 @@ def respond_with(found, resp):
         resp.status = falcon.HTTP_200
     else:
         resp.status = falcon.HTTP_NOT_FOUND
+
+
+class HealthResource(object):
+    @staticmethod
+    def on_get(req, resp):
+        respond_with('{"status": "ok"}')
 
 
 class TypesResource(object):
