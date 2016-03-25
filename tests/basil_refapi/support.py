@@ -19,7 +19,7 @@ def session_maker():
 
 def test_cache_conn():
     return recipes.bootstrap_store(os.environ['REDIS_HOST'],
-                                   os.environ['REDIS_PASSWORD'])
+                                   os.environ.get('REDIS_PASSWORD', ''))
 
 
 def cache_middleware():
