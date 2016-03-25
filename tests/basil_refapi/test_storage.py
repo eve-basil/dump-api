@@ -1,10 +1,10 @@
 import json
 
 import pytest
-import hamcrest as _
 
 import basil_refapi.storage as db
 import support
+from tests import *
 
 
 @pytest.fixture(scope="module")
@@ -14,31 +14,31 @@ def session():
 
 def test_get_by_id(session):
     r = db.Type.get(session, 34)
-    _.assert_that(r, _.has_property('name', _.equal_to('Tritanium')))
+    assert_that(r, has_property('name', equal_to('Tritanium')))
 
 
 def test_get_by_invalid_id(session):
     r = db.Type.get(session, -4)
-    _.assert_that(r, _.is_(_.none()))
+    assert_that(r, is_(none()))
 
 
 def test_find_unique(session):
     matches = db.Type.find(session, 'Tritani')
-    _.assert_that(matches, _.instance_of(list))
-    _.assert_that(matches, _.has_length(1))
-    _.assert_that(matches[0], _.has_property('name', _.equal_to('Tritanium')))
+    assert_that(matches, instance_of(list))
+    assert_that(matches, has_length(1))
+    assert_that(matches[0], has_property('name', equal_to('Tritanium')))
 
 
 def test_find_none(session):
     matches = db.Type.find(session, 'Gandalf')
-    _.assert_that(matches, _.instance_of(list))
-    _.assert_that(matches, _.is_(_.empty()))
+    assert_that(matches, instance_of(list))
+    assert_that(matches, is_(empty()))
 
 
 def test_find_many(session):
     matches = db.Type.find(session, 'Prototype')
-    _.assert_that(matches, _.instance_of(list))
-    _.assert_that(matches, _.has_length(33))
+    assert_that(matches, instance_of(list))
+    assert_that(matches, has_length(33))
 
 
 def test_dict():
@@ -47,9 +47,9 @@ def test_dict():
                        capacity=0, base_price=12500000, market_group_id=3232,
                        portion_size=1, published=False)
     returned = instance.dict()
-    _.assert_that(returned, _.has_entries({'id': 12345, 'name': name,
-                                           'volume': 1.2, 'capacity': 0,
-                                           'portion_size': 1}))
+    assert_that(returned, has_entries({'id': 12345, 'name': name,
+                                       'volume': 1.2, 'capacity': 0,
+                                       'portion_size': 1}))
 
 
 def test_json():
@@ -62,7 +62,7 @@ def test_json():
     # no error by reloading from json string
     json.loads(returned)
 
-    _.assert_that(returned, _.contains_string('"id": 12345'))
-    _.assert_that(returned, _.contains_string('"volume": 1.2'))
-    _.assert_that(returned, _.contains_string('"capacity": 0'))
-    _.assert_that(returned, _.contains_string('"portion_size": 1'))
+    assert_that(returned, contains_string('"id": 12345'))
+    assert_that(returned, contains_string('"volume": 1.2'))
+    assert_that(returned, contains_string('"capacity": 0'))
+    assert_that(returned, contains_string('"portion_size": 1'))
