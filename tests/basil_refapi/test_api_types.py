@@ -2,7 +2,7 @@ import basil_common.db as db
 import falcon
 import pytest
 
-import basil_refapi.api
+from basil_refapi import api
 import support
 from tests import *
 
@@ -10,7 +10,7 @@ from tests import *
 @pytest.fixture(scope="module")
 def app():
     middleware = [db.SessionManager(support.session_maker())]
-    return basil_refapi.api.create_api(middleware)
+    return api.create_api(middleware)
 
 application = app()
 
