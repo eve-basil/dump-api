@@ -16,29 +16,33 @@ application = app()
 
 
 def test_get_by_prefix(client):
-    resp = client.get('/types?name:starts=Tritan')
+    resp = client.get('/systems?name:starts=G-')
     assert_that(resp, has_property('status'), falcon.HTTP_OK)
-    assert_that(resp.json, has_length(2))
-    assert_that(resp.json[0], has_entry('id', 17916))
-    assert_that(resp.json[1], has_entry('name', 'Tritanium'))
+    assert_that(resp.json, has_length(34))
+    assert_that(resp.json[0], has_entry('id', 30001041))
+    assert_that(resp.json, has_item({u'region_id': 10000014,
+                                     u'faction_id': None,
+                                     u'constellation_id': 20000179,
+                                     u'security': -0.135772, u'id': 30001227,
+                                     u'name': u'G-AOTH'}))
 
 
 def test_get_by_id(client):
-    resp = client.get('/types/34')
+    resp = client.get('/systems/30001213')
     assert_that(resp, has_property('status'), falcon.HTTP_OK)
-    assert_that(resp.json, has_entry('name', 'Tritanium'))
+    assert_that(resp.json, has_entry('name', 'MUXX-4'))
 
 
 def test_get_by_str_id(client):
-    resp = client.get('/types/thirtyfour')
+    resp = client.get('/systems/thirtyfour')
     assert_that(resp, has_property('status'), falcon.HTTP_BAD_REQUEST)
 
 
 def test_get_by_unknown_id(client):
-    resp = client.get('/types/99999999')
+    resp = client.get('/systems/99999999')
     assert_that(resp, has_property('status'), falcon.HTTP_NOT_FOUND)
 
 
 def test_put_by_str_id(client):
-    resp = client.put('/types/thirtyfour', None)
+    resp = client.put('/systems/thirtyfour', None)
     assert_that(resp, has_property('status'), falcon.HTTP_METHOD_NOT_ALLOWED)

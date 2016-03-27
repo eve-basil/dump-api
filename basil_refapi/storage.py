@@ -22,7 +22,7 @@ class Region(Base):
         if prefix:
             query = query.filter(Region.name.like(prefix + '%'))
 
-        return query.all()
+        return query.order_by(Region.name).all()
 
     @staticmethod
     def get(session, by_id):
@@ -51,7 +51,7 @@ class SolarSystem(Base):
         if prefix:
             query = query.filter(SolarSystem.name.like(prefix + '%'))
 
-        return query.all()
+        return query.order_by(SolarSystem.name).all()
 
     @staticmethod
     def get(session, by_id):
@@ -84,7 +84,7 @@ class Type(Base):
         if prefix:
             query = query.filter(Type.name.like(prefix + '%'))
 
-        return query.all()
+        return query.order_by(Type.name).all()
 
     @staticmethod
     def get(session, by_id):
@@ -106,3 +106,8 @@ class Type(Base):
 # skills = select t.typeID, t.typeName, g.groupName from invTypes as t inner
 # join invGroups as g on t.groupID= g.groupID where g.categoryID = 16 and
 # t.published = 1 order by g.groupName, typeName;
+
+# select s.stationId, stationName, activityName from staStations s inner join
+# ramAssemblyLineStations l on s.stationID = l.stationID inner join
+# ramAssemblyLineTypes t on l.assemblyLineTypeID = t.assemblyLineTypeID inner
+# join ramActivities a on t.activityID = a.activityID;

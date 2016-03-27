@@ -4,7 +4,7 @@ import falcon
 from basil_common import list_support as lists, logger, str_support as strs
 
 import recipes
-from storage import Type
+from storage import Region, SolarSystem, Type
 
 
 LOG = logger()
@@ -17,12 +17,16 @@ LOG = logger()
 def create_api(middleware):
     app = falcon.API(middleware=middleware)
     app.add_route('/health', HealthResource())
-    app.add_route('/types', TypesResource())
-    app.add_route('/types/{by_id}', TypeResource())
     app.add_route('/recipes/{activity}/{type_id}', ActivityResource())
     # NOTE Doesn't use recipes b/c of
     # https://github.com/falconry/falcon/issues/702
     app.add_route('/recipe/manufacturing', RecipeSearchResource())
+    app.add_route('/regions', StorageResources(Region))
+    app.add_route('/regions/{by_id}', StorageResource(Region))
+    app.add_route('/systems', StorageResources(SolarSystem))
+    app.add_route('/systems/{by_id}', StorageResource(SolarSystem))
+    app.add_route('/types', StorageResources(Type))
+    app.add_route('/types/{by_id}', StorageResource(Type))
     return app
 
 
@@ -40,22 +44,26 @@ class HealthResource(object):
         respond_with('{"status": "ok"}')
 
 
-class TypesResource(object):
-    @staticmethod
-    def on_get(req, resp):
+class StorageResources(object):
+    def __init__(self, resource_type):
+        self._db_type = resource_type
+
+    def on_get(self, req, resp):
         name_starts = req.get_param('name:starts', default=None)
-        result = Type.find(req.context['session'], name_starts)
+        result = self._db_type.find(req.context['session'], name_starts)
 
         found = [row.dict() for row in result]
         respond_with(json.dumps(found), resp)
 
 
-class TypeResource(object):
-    @staticmethod
-    def on_get(req, resp, by_id):
-        type_id = strs.as_int(by_id)
-        if type_id:
-            result = Type.get(req.context['session'], type_id)
+class StorageResource(object):
+    def __init__(self, resource_type):
+        self._db_type = resource_type
+
+    def on_get(self, req, resp, by_id):
+        resource_id = strs.as_int(by_id)
+        if resource_id:
+            result = self._db_type.get(req.context['session'], resource_id)
             if result:
                 respond_with(result.json(), resp)
             else:
