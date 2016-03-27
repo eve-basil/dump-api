@@ -46,7 +46,7 @@ class TypesResource(object):
         name_starts = req.get_param('name:starts', default=None)
         result = Type.find(req.context['session'], name_starts)
 
-        found = [row.dict() for row in result if row.is_clean()]
+        found = [row.dict() for row in result]
         respond_with(json.dumps(found), resp)
 
 
