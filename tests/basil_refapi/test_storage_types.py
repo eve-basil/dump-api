@@ -19,7 +19,7 @@ def test_get_by_id(session):
 
 def test_get_by_invalid_id(session):
     r = db.Type.get(session, -4)
-    assert_that(r, is_(none()))
+    assert_that(r, none())
 
 
 def test_find_unique(session):
@@ -32,7 +32,7 @@ def test_find_unique(session):
 def test_find_none(session):
     matches = db.Type.find(session, 'Gandalf')
     assert_that(matches, instance_of(list))
-    assert_that(matches, is_(empty()))
+    assert_that(matches, empty())
 
 
 def test_find_many(session):
@@ -61,8 +61,3 @@ def test_json():
 
     # no error by reloading from json string
     json.loads(returned)
-
-    assert_that(returned, contains_string('"id": 12345'))
-    assert_that(returned, contains_string('"volume": 1.2'))
-    assert_that(returned, contains_string('"capacity": 0'))
-    assert_that(returned, contains_string('"portion_size": 1'))

@@ -10,6 +10,62 @@ LOG = logger()
 Base = declarative_base()
 
 
+class Region(Base):
+    __tablename__ = 'mapRegions'
+    id = Column('regionID', Integer, primary_key=True)
+    name = Column('regionName', String(100), index=True)
+    faction_id = Column('factionID', Integer)
+
+    @staticmethod
+    def find(session, prefix=None):
+        query = session.query(Region)
+        if prefix:
+            query = query.filter(Region.name.like(prefix + '%'))
+
+        return query.all()
+
+    @staticmethod
+    def get(session, by_id):
+        return session.query(Region).filter_by(id=by_id).first()
+
+    def dict(self):
+        return {'id': self.id, 'name': self.name,
+                'faction_id': self.faction_id}
+
+    def json(self):
+        return json.dumps(self.dict())
+
+
+class SolarSystem(Base):
+    __tablename__ = 'mapSolarSystems'
+    id = Column('solarSystemID', Integer, primary_key=True)
+    name = Column('solarSystemName', String(100), index=True)
+    security = Column('security', Float)
+    constellation_id = Column('constellationID', Integer, index=True)
+    region_id = Column('regionID', Integer, index=True)
+    faction_id = Column('factionID', Integer)
+
+    @staticmethod
+    def find(session, prefix=None):
+        query = session.query(SolarSystem)
+        if prefix:
+            query = query.filter(SolarSystem.name.like(prefix + '%'))
+
+        return query.all()
+
+    @staticmethod
+    def get(session, by_id):
+        return session.query(SolarSystem).filter_by(id=by_id).first()
+
+    def dict(self):
+        return {'id': self.id, 'constellation_id': self.constellation_id,
+                'name': self.name, 'faction_id': self.faction_id,
+                'security': self.security, 'region_id': self.region_id}
+
+    def json(self):
+        return json.dumps(self.dict())
+
+
 class Type(Base):
     __tablename__ = 'invTypes'
     id = Column('typeID', Integer, primary_key=True)
@@ -40,17 +96,12 @@ class Type(Base):
                 'portion_size': self.portion_size}
 
     def json(self):
-        return json.dumps(self.dict())
-
-    def is_clean(self):
         try:
-            json.dumps({'name': self.name})
+            return json.dumps(self.dict())
         except UnicodeDecodeError:
             LOG.warning('UnicodeDecodeError decoding:: id=%s name=%s'
                         % (self.id, self.name))
-            return False
-        else:
-            return True
+            return None
 
 # skills = select t.typeID, t.typeName, g.groupName from invTypes as t inner
 # join invGroups as g on t.groupID= g.groupID where g.categoryID = 16 and
