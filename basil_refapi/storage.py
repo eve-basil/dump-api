@@ -66,6 +66,61 @@ class SolarSystem(Base):
         return json.dumps(self.dict())
 
 
+class Station(Base):
+    __activities = {1: 'Manufacturing', 3: 'Researching Time Efficiency',
+                    4: 'Researching Material Efficiency', 5: 'Copying',
+                    7: 'Reverse Engineering', 8: 'Invention'}
+    __tablename__ = 'staStations'
+    id = Column('stationID', Integer, primary_key=True)
+    name = Column('stationName', String(100), index=True)
+    region_id = Column('regionID', Integer)
+    constellation_id = Column('constellationID', Integer)
+    system_id = Column('solarSystemID', Integer)
+    owning_corp = Column('corporationID', Integer)
+    office_rental = Column('officeRentalCost', Integer)
+    reprocessing_efficiency = Column('reprocessingEfficiency', Float)
+    _session = None
+
+    # TODO activities_available via ramAssemblyLineStations and activities
+    @staticmethod
+    def find(session, prefix=None):
+        query = session.query(Station)
+        if prefix:
+            query = query.filter(Station.name.like(prefix + '%'))
+
+        found = query.order_by(Station.name).all()
+        for station in found:
+            station._session = session
+        return found
+
+    @staticmethod
+    def get(session, by_id):
+        found = session.query(Station).filter_by(id=by_id).first()
+        if found:
+            found._session = session
+        return found
+
+    def dict(self):
+        return {'id': self.id, 'constellation_id': self.constellation_id,
+                'system_id': self.system_id, 'system_name': self.system_name,
+                'region_name': self.region_name, 'name': self.name,
+                'region_id': self.region_id, 'owning_corp': self.owning_corp,
+                'reprocessing_efficiency': self.reprocessing_efficiency,
+                'office_rental': self.office_rental}
+
+    def json(self):
+        return json.dumps(self.dict())
+
+    @property
+    def region_name(self):
+        return Region.get(self._session, self.region_id).name
+
+    @property
+    def system_name(self):
+        # 30004712
+        return SolarSystem.get(self._session, self.system_id).name
+
+
 class Type(Base):
     __tablename__ = 'invTypes'
     id = Column('typeID', Integer, primary_key=True)

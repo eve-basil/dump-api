@@ -4,7 +4,7 @@ import falcon
 from basil_common import list_support as lists, logger, str_support as strs
 
 import recipes
-from storage import Region, SolarSystem, Type
+from storage import Region, SolarSystem, Station, Type
 
 
 LOG = logger()
@@ -23,6 +23,8 @@ def create_api(middleware):
     app.add_route('/recipe/manufacturing', RecipeSearchResource())
     app.add_route('/regions', StorageResources(Region))
     app.add_route('/regions/{by_id}', StorageResource(Region))
+    app.add_route('/stations', StorageResources(Station))
+    app.add_route('/stations/{by_id}', StorageResource(Station))
     app.add_route('/systems', StorageResources(SolarSystem))
     app.add_route('/systems/{by_id}', StorageResource(SolarSystem))
     app.add_route('/types', StorageResources(Type))

@@ -17,7 +17,7 @@ application = app()
 
 def test_get_by_prefix(client):
     resp = client.get('/types?name:starts=Tritan')
-    assert_that(resp, has_property('status'), falcon.HTTP_OK)
+    assert_that(resp, has_property('status', equal_to(falcon.HTTP_OK)))
     assert_that(resp.json, has_length(2))
     assert_that(resp.json[0], has_entry('id', 17916))
     assert_that(resp.json[1], has_entry('name', 'Tritanium'))
