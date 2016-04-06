@@ -43,7 +43,11 @@ def respond_with(found, resp):
 class HealthResource(object):
     @staticmethod
     def on_get(req, resp):
-        respond_with('{"status": "ok"}')
+        pong = req.context['recipes'].ping()
+        record = req.context['session'].query(Type).first()
+        if pong and record:
+            respond_with('{"status": "ok"}', resp)
+        raise falcon.HTTPInternalServerError('Service Unavailable.', None)
 
 
 class StorageResources(object):
