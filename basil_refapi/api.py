@@ -1,18 +1,19 @@
 import json
+import logging
 
 import falcon
-from basil_common import list_support as lists, logger, str_support as strs
+from basil_common import list_support as lists, str_support as strs
+from basil_common.falcon_support import respond
 
 import recipes
 from storage import Region, SolarSystem, Station, Type
 
 
-LOG = logger()
+LOG = logging.getLogger(__name__)
 
 
 # TODO create common caching/headers middleware, see also
-# https://svn.tools.ietf.org/svn/wg/httpbis/draft-ietf-httpbis/
-# latest/p2-semantics.html
+# https://svn.tools.ietf.org/svn/wg/httpbis/specs/rfc7231.html
 
 def create_api(middleware):
     app = falcon.API(middleware=middleware)
@@ -32,21 +33,13 @@ def create_api(middleware):
     return app
 
 
-def respond_with(found, resp):
-    if found:
-        resp.body = found
-        resp.status = falcon.HTTP_200
-    else:
-        resp.status = falcon.HTTP_NOT_FOUND
-
-
 class HealthResource(object):
     @staticmethod
     def on_get(req, resp):
         pong = req.context['recipes'].ping()
         record = req.context['session'].query(Type).first()
         if pong and record:
-            respond_with('{"status": "ok"}', resp)
+            respond(resp, body='{"status": "ok"}')
         raise falcon.HTTPInternalServerError('Service Unavailable.', None)
 
 
@@ -59,7 +52,7 @@ class StorageResources(object):
         result = self._db_type.find(req.context['session'], name_starts)
 
         found = [row.dict() for row in result]
-        respond_with(json.dumps(found), resp)
+        respond(resp, body=json.dumps(found))
 
 
 class StorageResource(object):
@@ -68,15 +61,15 @@ class StorageResource(object):
 
     def on_get(self, req, resp, by_id):
         resource_id = strs.as_int(by_id)
-        if resource_id:
-            result = self._db_type.get(req.context['session'], resource_id)
-            if result:
-                respond_with(result.json(), resp)
-            else:
-                raise falcon.HTTPNotFound
-        else:
+        if not resource_id:
             raise falcon.HTTPBadRequest('Invalid ID',
                                         'Expected integer identifier')
+
+        result = self._db_type.get(req.context['session'], resource_id)
+        if result:
+            respond(resp, body=result.json())
+        else:
+            respond(resp, status=falcon.HTTP_NOT_FOUND)
 
 
 class ActivityResource(object):
@@ -85,9 +78,9 @@ class ActivityResource(object):
         if activity in recipes.ACTIVITY_KEYS:
             recipe_store = req.context['recipes']
             lookup = recipe_store.activity(activity)
-            respond_with(lookup(type_id), resp)
+            respond(resp, body=lookup(type_id))
         else:
-            raise falcon.HTTPNotFound
+            respond(resp, status=falcon.HTTP_NOT_FOUND)
 
 
 class ManufResource(object):
@@ -95,7 +88,7 @@ class ManufResource(object):
     def on_get(req, resp, type_id):
         recipe_store = req.context['recipes']
         lookup = recipe_store.activity('manufacturing')
-        respond_with(lookup(type_id), resp)
+        respond(resp, lookup(type_id))
 
 
 class RecipeSearchResource(object):
@@ -113,24 +106,21 @@ class RecipeSearchResource(object):
             search_id = req.get_param_as_int('material')
             self.__find_in(func, search_id, recipe_store, resp)
         else:
-            raise falcon.HTTPMissingParam('material" or "product')
+            raise falcon.HTTPMissingParam('"material" or "product"')
 
     def __find_in(self, func, search, store, resp):
         if search:
-            search_key = func(search)
+            search_key = store.manufacturing(search)
             if search_key:
+                if lists.is_list_like(search_key):
+                    limited_matches = lists.list_from_str(search_key)
+                    matches = [func(n.strip()) for n in limited_matches
+                               if func(n.strip())]
+                    found = '[' + ','.join(matches) + ']'
+                else:
+                    found = store.manufacturing(search_key)
+                respond(resp, body=found)
                 self.__find_resource(store.manufacturing, search_key, resp)
                 return
 
         raise falcon.HTTPNotFound()
-
-    @staticmethod
-    def __find_resource(func, param, resp):
-        if lists.is_list_like(param):
-            limited_matches = lists.list_from_str(param)
-            matches = [func(n.strip()) for n in limited_matches
-                       if func(n.strip())]
-            found = '[' + ','.join(matches) + ']'
-        else:
-            found = func(param)
-        respond_with(found, resp)

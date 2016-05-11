@@ -14,13 +14,20 @@ def ensure_cache(store):
     pong = store.ping()
     if not pong:
         raise SystemExit('Could not connect to Blueprint Cache')
+    LOG.info('Cache Connected')
 
 
 def ensure_data(session):
-    first = session.query(storage.Type).first()
-    session.close()
-    if not first:
-        raise SystemExit('Could not connect to Eve SDK Static Reference DB')
+    try:
+        first = session.query(storage.Type).first()
+        session.close()
+        if not first:
+            raise SystemExit('Cannot connect to Eve SDK Static Reference DB')
+    except ImportError as ex:
+        LOG.fatal(ex.message)
+        raise
+    else:
+        LOG.info('DB Connected')
 
 
 def initialize_app():
@@ -31,11 +38,9 @@ def initialize_app():
     recipe_store = rec.bootstrap_store(os.environ['REDIS_HOST'],
                                        os.environ['REDIS_PASSWORD'])
     ensure_cache(recipe_store)
-    LOG.info('Cache Connected')
 
     db_store = db.prepare_storage(configurables.database_connector(), 7200)
     ensure_data(db_store())
-    LOG.info('DB Connected')
 
     injector = falcon_support.InjectorMiddleware(
         {'recipes': rec.Recipes(recipe_store)})

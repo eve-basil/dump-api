@@ -32,6 +32,9 @@ class Recipes(object):
     def prints_using_material(self, mat_id):
         return self._recipes.get('bym_' + str(mat_id))
 
+    def ping(self):
+        return self._recipes.ping()
+
 
 def bootstrap_store(host, password):
     pool = redis.ConnectionPool(host=host, password=password)
