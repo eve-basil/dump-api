@@ -23,7 +23,8 @@ def test_get_by_prefix(client):
     assert_that(resp.json, has_item({u'region_id': 10000014,
                                      u'faction_id': None,
                                      u'constellation_id': 20000179,
-                                     u'security': -0.135772, u'id': 30001227,
+                                     u'security': -0.1357720952711935,
+                                     u'id': 30001227,
                                      u'name': u'G-AOTH'}))
 
 

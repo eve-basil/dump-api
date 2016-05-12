@@ -38,7 +38,7 @@ def test_find_none(session):
 def test_find_many(session):
     matches = db.Type.find(session, 'Prototype')
     assert_that(matches, instance_of(list))
-    assert_that(matches, has_length(27))
+    assert_that(matches, has_length(35))
 
 
 def test_dict():
