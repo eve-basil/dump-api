@@ -1,5 +1,5 @@
 # Base requirements
-basil-common==0.1.0.dev
+git+https://github.com/eve-basil/common.git
 falcon==0.3.0
 PyYAML==3.11
 SQLAlchemy==1.0.10
