@@ -34,6 +34,10 @@ def create_api(middleware):
 
 
 class HealthResource(object):
+    """Provides a health check endpoint
+
+       Ensures the service is running and accessing the data sources expected.
+    """
     @staticmethod
     def on_get(req, resp):
         pong = req.context['recipes'].ping()
@@ -44,6 +48,12 @@ class HealthResource(object):
 
 
 class StorageResources(object):
+    """Provides read-only access to lists of resources from DB Storage.
+
+       Any type from Storage, and thus from the DB can be specified as a
+       resource_type to the StorageResources constructor to allow common
+       GET query operation.
+    """
     def __init__(self, resource_type):
         self._db_type = resource_type
 
@@ -56,6 +66,11 @@ class StorageResources(object):
 
 
 class StorageResource(object):
+    """Provides read-only access to resources from DB Storage.
+
+       Any type from Storage, and thus from the DB can be specified as a
+       resource_type to the StorageResources constructor to allow a GET.
+    """
     def __init__(self, resource_type):
         self._db_type = resource_type
 
@@ -73,25 +88,23 @@ class StorageResource(object):
 
 
 class ActivityResource(object):
+    """Provides read-only access to blueprint recipes, organized by activity.
+    """
     @staticmethod
     def on_get(req, resp, activity, type_id):
         if activity in recipes.ACTIVITY_KEYS:
             recipe_store = req.context['recipes']
-            lookup = recipe_store.activity(activity)
-            respond(resp, body=lookup(type_id))
+            activity_lookup = recipe_store.activity(activity)
+            respond(resp, body=activity_lookup(type_id))
         else:
             respond(resp, status=falcon.HTTP_NOT_FOUND)
 
 
-class ManufResource(object):
-    @staticmethod
-    def on_get(req, resp, type_id):
-        recipe_store = req.context['recipes']
-        lookup = recipe_store.activity('manufacturing')
-        respond(resp, lookup(type_id))
-
-
 class RecipeSearchResource(object):
+    """Provides read-only searching for blueprint manufacture recipes.
+
+       Searches can be by product or by material.
+    """
     def on_get(self, req, resp):
         recipe_store = req.context['recipes']
         if 'product' in req.params:
@@ -99,9 +112,6 @@ class RecipeSearchResource(object):
             search_id = req.get_param_as_int('product')
             self.__find_in(func, search_id, recipe_store, resp)
         elif 'material' in req.params:
-            # TODO should add pagination in this call
-            # maybe like https://github.com/etalab/ban/blob/master/ban/http
-            # /resources.py#L45
             func = recipe_store.prints_using_material
             search_id = req.get_param_as_int('material')
             self.__find_in(func, search_id, recipe_store, resp)
