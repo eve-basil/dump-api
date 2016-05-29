@@ -2,12 +2,12 @@ import json
 import os
 
 import yaml
-from basil_common import configurables, logger
+from basil_common import configurables, logging
 
 import recipes as recipes
 
 # TODO rewrite this
-LOG = logger()
+LOG = logging.getLogger(__name__)
 
 
 def collect_activities(blueprint):
