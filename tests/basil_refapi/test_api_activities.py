@@ -8,7 +8,9 @@ from tests.basil_refapi import support
 
 @pytest.fixture(scope="module")
 def app():
-    return api.create_api([support.cache_middleware()])
+    engine, sessions = support.session_maker()
+    middleware = [db.SessionManager(sessions)]
+    return api.create_api(middleware)
 
 application = app()
 
