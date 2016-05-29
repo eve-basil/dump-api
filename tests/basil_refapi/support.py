@@ -1,10 +1,9 @@
 import os
 
-import basil_common.db as db
-import tests.basil_refapi
-
+from basil_common import db
 from basil_common.falcon_support import InjectorMiddleware
 from basil_refapi import recipes
+import tests.basil_refapi
 
 
 def test_db_conn():
@@ -14,7 +13,8 @@ def test_db_conn():
 
 def session_maker():
     conn_str = test_db_conn()
-    return db.prepare_storage(connect_str=conn_str, conn_timeout=600)
+    engine = db.prepare_storage_engine(connect_str=conn_str, conn_timeout=120)
+    return engine, db.prepare_storage_for_engine(engine)
 
 
 def test_cache_conn():

@@ -3,10 +3,9 @@ import json
 from sqlalchemy import Column, Float, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
-from basil_common import logger
+from basil_common import logging
 
-
-LOG = logger()
+LOG = logging.getLogger(__name__)
 Base = declarative_base()
 
 
@@ -26,7 +25,7 @@ class Region(Base):
 
     @staticmethod
     def get(session, by_id):
-        return session.query(Region).filter_by(id=by_id).first()
+        return session.query(Region).get(by_id)
 
     def dict(self):
         return {'id': self.id, 'name': self.name,
@@ -55,7 +54,7 @@ class SolarSystem(Base):
 
     @staticmethod
     def get(session, by_id):
-        return session.query(SolarSystem).filter_by(id=by_id).first()
+        return session.query(SolarSystem).get(by_id)
 
     def dict(self):
         return {'id': self.id, 'constellation_id': self.constellation_id,
@@ -95,7 +94,7 @@ class Station(Base):
 
     @staticmethod
     def get(session, by_id):
-        found = session.query(Station).filter_by(id=by_id).first()
+        found = session.query(Station).get(by_id)
         if found:
             found._session = session
         return found
@@ -133,22 +132,46 @@ class Type(Base):
     portion_size = Column('portionSize', Integer)
     published = Column(Boolean)
 
+    meta_level = None
+    _meta_level_attrib_query = ("select attributeID from dgmAttributeTypes "
+                                "where attributeName = 'metaLevel';")
+    _meta_lvl_query = ("select valueInt from dgmTypeAttributes "
+                       "where typeID = %s and attributeID = %s")
+
+    @staticmethod
+    def initialize(engine):
+        result = engine.execute(Type._meta_level_attrib_query)
+        for row in result:
+            Type.meta_level = row[0]
+
     @staticmethod
     def find(session, prefix=None):
         query = session.query(Type).filter_by(published=True)
         if prefix:
             query = query.filter(Type.name.like(prefix + '%'))
 
-        return query.order_by(Type.name).all()
+        type_instances = query.order_by(Type.name).all()
+        for instance in type_instances:
+            instance.add_meta_level(session)
+        return type_instances
 
     @staticmethod
     def get(session, by_id):
-        return session.query(Type).filter_by(id=by_id).first()
+        instance = session.query(Type).get(by_id)
+        if instance:
+            instance.add_meta_level(session)
+        return instance
+
+    def add_meta_level(self, session):
+        query = Type._meta_lvl_query % (self.id, Type.meta_level)
+        result = session.execute(query).first()
+        if result:
+            self.meta_level = result[0]
 
     def dict(self):
         return {'id': self.id, 'name': self.name.decode('utf-8', 'replace'),
                 'volume': self.volume, 'capacity': self.capacity,
-                'portion_size': self.portion_size}
+                'meta': self.meta_level, 'portion_size': self.portion_size}
 
     def json(self):
         try:

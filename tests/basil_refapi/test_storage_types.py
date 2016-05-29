@@ -9,7 +9,9 @@ from tests import *
 
 @pytest.fixture(scope="module")
 def session():
-    return support.session_maker()()
+    engine, sessions = support.session_maker()
+    db.Type.initialize(engine)
+    return sessions()
 
 
 def test_get_by_id(session):

@@ -1,13 +1,14 @@
+import logging
 import os
 
-from basil_common import configurables, db, logger
+from basil_common import configurables, db
 from basil_common import falcon_support
 
 import api
 import recipes as rec
 import storage
 
-LOG = logger()
+LOG = logging.getLogger(__name__)
 
 
 def ensure_cache(store):
@@ -17,11 +18,10 @@ def ensure_cache(store):
     LOG.info('Cache Connected')
 
 
-def ensure_data(session):
+def prepare_data_conn(engine):
     try:
-        first = session.query(storage.Type).first()
-        session.close()
-        if not first:
+        storage.Type.initialize(engine)
+        if not storage.Type.meta_level:
             raise SystemExit('Cannot connect to Eve SDK Static Reference DB')
     except ImportError as ex:
         LOG.fatal(ex.message)
@@ -39,8 +39,10 @@ def initialize_app():
                                        os.environ['REDIS_PASSWORD'])
     ensure_cache(recipe_store)
 
-    db_store = db.prepare_storage(configurables.database_connector(), 7200)
-    ensure_data(db_store())
+    db_connector = configurables.database_connector()
+    db_engine = db.prepare_storage_engine(db_connector, 5200)
+    db_store = db.prepare_storage_for_engine(db_engine)
+    prepare_data_conn(db_engine())
 
     injector = falcon_support.InjectorMiddleware(
         {'recipes': rec.Recipes(recipe_store)})
