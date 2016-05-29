@@ -1,7 +1,6 @@
 import falcon
 import pytest
 
-from basil_common import db
 from basil_refapi import api
 from tests import *
 from tests.basil_refapi import support
@@ -9,8 +8,7 @@ from tests.basil_refapi import support
 
 @pytest.fixture(scope="module")
 def app():
-    engine, sessions = support.session_maker()
-    middleware = [db.SessionManager(sessions)]
+    middleware = [support.cache_middleware()]
     return api.create_api(middleware)
 
 application = app()
