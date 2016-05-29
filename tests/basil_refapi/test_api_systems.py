@@ -1,7 +1,7 @@
 import falcon
 import pytest
 
-import basil_common.db as db
+from basil_common import db
 from basil_refapi import api
 import support
 from tests import *
